@@ -9,7 +9,8 @@
     "prisma": "node -r ./scripts/with-database-url.js ./node_modules/prisma/build/index.js",
     "prisma:generate": "npm run prisma -- generate",
     "prisma:migrate": "npm run prisma -- migrate deploy",
-    "prisma:seed": "npm run prisma -- db seed"
+    "prisma:seed": "npm run prisma -- db seed",
+    "deploy": "bash scripts/deploy.sh"
   },
   "private": true,
   "prisma": {

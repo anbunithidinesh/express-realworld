@@ -79,13 +79,33 @@ npm run prisma:seed
 
 ## Deploy on a remote server
 
-Run the following command to:
+Ensure a production `.env` exists on the server, then run:
+
+```shell
+chmod +x scripts/deploy.sh
+npm run deploy
+```
+
+That script will:
+- load `.env` into the process environment
+- install PM2 globally if missing
 - install dependencies
 - generate the Prisma client
 - build the app into `dist/`
-- apply any new migration sql scripts
-- run the server
+- apply any new migration SQL scripts
+- start or restart the app with PM2 (`conduit-api`)
+
+Useful PM2 commands after deploy:
 
 ```shell
-npm ci && npm run prisma:generate && npm run build && npm run prisma:migrate && node dist/api/main.js
+pm2 status
+pm2 logs conduit-api
+pm2 restart conduit-api
+```
+
+To survive reboots once:
+
+```shell
+pm2 startup
+pm2 save
 ```
