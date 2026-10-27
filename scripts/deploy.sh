@@ -23,6 +23,7 @@ set -a
 source .env
 set +a
 
+# App runs as production; install still needs nx/prisma (devDependencies)
 export NODE_ENV="${NODE_ENV:-production}"
 
 if ! command -v pm2 >/dev/null 2>&1; then
@@ -30,8 +31,9 @@ if ! command -v pm2 >/dev/null 2>&1; then
   npm install -g pm2
 fi
 
-echo "==> Installing dependencies"
-npm ci
+echo "==> Installing dependencies (including build tools)"
+# --include=dev: NODE_ENV=production would otherwise skip nx, prisma, etc.
+npm ci --include=dev
 
 echo "==> Generating Prisma client"
 npm run prisma:generate
@@ -47,7 +49,8 @@ if pm2 describe "$APP_NAME" >/dev/null 2>&1; then
   # Delete + start so updated .env values are applied cleanly
   pm2 delete "$APP_NAME"
 fi
-pm2 start ecosystem.config.cjs --only "$APP_NAME" --update-env
+# Ensure the process sees production even if .env had development
+NODE_ENV=production pm2 start ecosystem.config.cjs --only "$APP_NAME" --update-env
 pm2 save
 
 echo "==> Deploy complete. Useful commands:"
